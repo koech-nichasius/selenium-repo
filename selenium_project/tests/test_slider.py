@@ -3,6 +3,7 @@ import pytest
 from selenium_project.resources.selenium_data import SeleniumData
 
 
+@pytest.mark.ui
 class TestSlider:
     """Test suite for validating Slider behavior."""
 

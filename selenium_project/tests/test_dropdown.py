@@ -1,5 +1,6 @@
 import pytest
 
+@pytest.mark.ui
 class TestDropdown:
     """Test suite for validating Dropdown behavior."""
 

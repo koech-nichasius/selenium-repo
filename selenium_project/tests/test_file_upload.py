@@ -11,19 +11,19 @@ def uploaded_file(file_upload):
     file_upload.upload_file(str(file_path))
     return file_upload
 
-
+@pytest.mark.ui
 def test_correct_file_selected(uploaded_file):
     """Verify correct file is selected."""
     uploaded_name = Path(uploaded_file.get_uploaded_file()).name
     assert uploaded_name == file_path.name
 
-
+@pytest.mark.ui
 def test_file_upload_success(uploaded_file):
     """Verify file upload is successful."""
     uploaded_file.tap_submit_btn()
     assert uploaded_file.is_file_submitted()
 
-
+@pytest.mark.ui
 def test_error_count_in_file():
     """Verify the number of lines containing the word 'ERROR' in file."""
     expected_errors = 5

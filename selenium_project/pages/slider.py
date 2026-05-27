@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-from selenium_project.core.base_page import BasePage
+from selenium_project.pages.base_page import BasePage
 from selenium_project.resources.locators import CommonLocator
 from selenium_project.resources.selenium_data import SeleniumData
 

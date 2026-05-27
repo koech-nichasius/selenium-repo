@@ -1,6 +1,8 @@
 import random
 
+import pytest
 
+@pytest.mark.ui
 class TestDatePicker:
     """Test suite for validating Date picker behavior."""
 
