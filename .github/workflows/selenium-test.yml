@@ -62,7 +62,7 @@ jobs:
   
       - name: Publish Test Results
         if: ${{ always() }}
-        uses: EnricoMi/publish-unit-result-action@v2
+        uses: EnricoMi/publish-unit-test-results-action@v2
         with:
           files: test-results/**/*.xml
             
