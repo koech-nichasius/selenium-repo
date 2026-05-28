@@ -35,7 +35,7 @@ jobs:
           sudo apt-get install -y chromium-browser
           
       - name: Run tests
-        run: pytest tests/ -v tests/
+        run: pytest -v tests/
 
       - name: Upload raw test data
         if: always()
