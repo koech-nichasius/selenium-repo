@@ -28,7 +28,7 @@ jobs:
         run: |
           pip install -r requirements
           pip install pytest
-          
+
       - name: Install Chrome
         run: |
           sudo apt-get update
@@ -65,12 +65,14 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: test-results/**/*.xml
-            
+          run: echo "{markdown content}" >> $GITHUB_STEP_SUMMARY
+
       - name: Upload reports
         uses: actions/upload-artifact@v4
         with:
           name: final-reports
           path: test-results/
+
               
   cleanup:
     runs-on: ubuntu-latest
@@ -80,5 +82,6 @@ jobs:
     steps:
       - name: Cleanup info
         run: echo "Cleanup completed"
+
 
 
