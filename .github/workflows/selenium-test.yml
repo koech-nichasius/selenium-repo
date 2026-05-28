@@ -1,4 +1,3 @@
-
 name: Run Selenium Tests
 
 on:
@@ -8,80 +7,44 @@ on:
     branches: [ main ]
   workflow_dispatch:
     inputs:
-     browser:
-       description: "Browser to run tests"
-       required: true
-       default: "chrome"
+      browser:
+        description: "Browser to run tests"
+        required: true
+        default: "chrome"
 
 jobs:
 
-  setup:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements
-          pip install pytest
-
-      - name: Install Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser
-
-      - name: Cache workspace
-        uses: actions/upload-artifact@v4
-        with:
-          name: workspace
-          path: .
-
   test:
     runs-on: ubuntu-latest
-    needs: setup
-  
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-  
-      - name: Set up Python
+
+      - name: Set up Python (with cache)
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-  
-      # Cache pip packages
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-  
+          cache: "pip"
+
       - name: Install dependencies
-        run: |
-          pip install -r requirements
-  
+        run: pip install -r requirements
+
       - name: Install Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y chromium-browser
 
       - name: Run tests
-        run: pytest tests/ -v tests/
+        run: |
+          echo "Browser: ${{ github.event.inputs.browser }}"
+          pytest tests/ -v
 
-      - name: Upload raw test data
+      - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-output
+          name: reports
           path: reports/
 
   report:
@@ -89,32 +52,13 @@ jobs:
     needs: test
 
     steps:
-      - name: Download test results
+      - name: Download reports
         uses: actions/download-artifact@v4
         with:
-          name: test-output
+          name: reports
 
-      - name: Upload reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: final-reports
-          path: reports/
-          
-      # Show results directly in GitHub UI
       - name: Publish Test Results
-        if: ${{ always() }}
+        if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
-          files: |
-            test-results/**/*.xml
-            
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: report
-    if: always()
-
-    steps:
-      - name: Cleanup info
-        run: echo "Cleanup completed"
-
-
+          files: test-results/**/*.xml
