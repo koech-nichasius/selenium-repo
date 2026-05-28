@@ -1,3 +1,4 @@
+
 name: Run Selenium Tests
 
 on:
@@ -7,34 +8,77 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+
+  setup:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
-    - name: Install dependencies
-      run: |
-        pip install -r requirements
-        pip install pytest
+      - name: Install dependencies
+        run: |
+          pip install -r requirements
+          pip install pytest
 
-    - name: Install Chrome
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y chromium-browser
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
 
-    - name: Run tests
-      run: pytest tests/ -v
+      - name: Cache workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace
+          path: .
 
-    - name: Upload reports
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-reports
-        path: reports/
+  test:
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Download workspace
+        uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v
+
+      - name: Upload raw test data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-output
+          path: reports/
+
+  report:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-output
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-reports
+          path: reports/
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: report
+    if: always()
+
+    steps:
+      - name: Cleanup info
+        run: echo "Cleanup completed"
